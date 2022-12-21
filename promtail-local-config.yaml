@@ -8,6 +8,12 @@ positions:
 clients:
   - url: http://localhost:3100/loki/api/v1/push
 
+# This configuration file, initially contained regular
+# expressions to split out labels via the conf. More
+# experience has shown that labels can be split out at
+# query time. For me, at query time seems to work
+# the best. I do perform timestamp extraction, if
+# necessary, here.
 scrape_configs:
 - job_name: system
   static_configs:
@@ -18,27 +24,9 @@ scrape_configs:
       __path__: /var/log/*log
 - job_name: apache
   pipeline_stages:
-  - match:
-      selector: '{job="apache"}'
-      stages:
-      - regex:
-          expression: "^(?P<ip>\\S+) (?P<identd>\\S+) (?P<user>\\S+) \\[(?P<timestamp>[\\w:/]+\\s[+\\-]\\d{4})\\] \"(?P<action>\\S+)\\s?(?P<path>\\S+)?\\s?(?P<protocol>\\S+)?\" (?P<status_code>\\d{3}|-) (?P<size>\\d+|-)\\s?\"?(?P<referer>[^\"]*)\"?\\s?\"?(?P<useragent>[^\"]*)?\"?$"
-      - labels:
-          ip:
-          #identd:
-          #user:
-          #timestamp:
-          #action:
-          #path:
-          #protocol:
-          #status_code:
-          #size:
-          referer:
-          #useragent:
   static_configs:
   - targets:
      - localhost
     labels:
       job: apache
-      #env: dev
       __path__: /var/log/apache2/access.log

@@ -16,13 +16,6 @@ common:
     kvstore:
       store: inmemory
 
-#query_range:
-#  results_cache:
-#    cache:
-#      embedded_cache:
-#        enabled: true
-#        max_size_mb: 100
-
 schema_config:
   configs:
     - from: 2020-10-24
@@ -33,18 +26,21 @@ schema_config:
         prefix: index_
         period: 24h
 
+# This options overrides the 30 day
+# constraint which is now a Grafana default.
+# Without it an error will be thrown
+# during query greater than a month
+limits_config:
+  max_query_length: 0h
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 4096
+
+frontend:
+  max_outstanding_per_tenant: 4096
+
 ruler:
   alertmanager_url: http://localhost:9093
 
-# By default, Loki will send anonymous, but uniquely-identifiable usage and configuration
-# analytics to Grafana Labs. These statistics are sent to https://stats.grafana.org/
-#
-# Statistics help us better understand how Loki is used, and they show us performance
-# levels for most users. This helps us prioritize features and documentation.
-# For more information on what's sent, look at
-# https://github.com/grafana/loki/blob/main/pkg/usagestats/stats.go
-# Refer to the buildReport method to see what goes into a report.
-#
-# If you would like to disable reporting, uncomment the following lines:
-#analytics:
-#  reporting_enabled: false
+analytics:
+  reporting_enabled: false
